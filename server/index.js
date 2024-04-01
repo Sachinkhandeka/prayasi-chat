@@ -2,12 +2,16 @@ if( process.env.NODE_ENV !== "production" ) {
     require("dotenv").config();
 }
 const express = require("express");
-const port = 8080 || process.env.PORT ; 
+const port = process.env.PORT || 8080; 
 const app = express();
 const cors = require("cors");
 const userRouter = require("./routes/user");
 const  mongoose  = require("mongoose");
 const DB_URL = process.env.MONGO_URL ;
+
+//some helpfull middlewares 
+app.use(express.json()); //for json pauload data from client to server
+app.use(cors());  //for cross origin req
 
 main().then(()=> {
     console.log("Connection to mongoDB successfull!");
@@ -19,14 +23,9 @@ async function main() {
     await mongoose.connect(DB_URL);
 }
 
-//some helpfull middlewares 
-app.use(express.json());
-app.use(cors());
-app.use(express.urlencoded({ extended : true }));
-
-
 // Mounting the userRouter onto the "/test" route
-app.use("/test", userRouter);
+// app.use("/test", userRouter);
+app.use("/api/user", userRouter );
 
 
 //middleware for error handling

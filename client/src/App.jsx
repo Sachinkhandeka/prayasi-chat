@@ -5,10 +5,22 @@ import ChannelListContainer from "./components/ChannelListContainer";
 import ChannelContainer from "./components/ChannelContainer";
 import Auth from "./components/Auth";
 
-const apiKey = 'nzg4gfbpxnjn';
-const apiSecret = 'w32pe2g92w9n286b9haajffkw29k8hh6swksjkhj5pyfutmh3f6w6chqqa7aveny';
-const authToken = false ; 
+const cookies  = new Cookies();
+
+const apiKey = 'sh4p4y7zy97n';
+const authToken = cookies.get('token'); 
 const client = StreamChat.getInstance(apiKey);
+
+if(authToken) {
+  client.connectUser({
+    id : cookies.get("userId"),
+    name : cookies.get("username"),
+    fullName : cookies.get("fullName"),
+    image : cookies.get("avatar"),
+    mobileNumber : cookies.get("mobileNumber"),
+  }, authToken);
+}
+
 
 export default function App() {
   if(!authToken) {

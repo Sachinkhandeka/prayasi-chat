@@ -11,7 +11,7 @@ export default  function TeamChannelPreview({ channel , type }) {
 
 
     const DirectPreview = ()=> {
-        const members = Object.values(channel.states.members).filter(({ user })=> user.id !== client.userId );
+        const members = Object.values(channel.states.members).filter(({ user })=> user.id !== client.id );
 
         return (
             <div>

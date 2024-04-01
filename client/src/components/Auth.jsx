@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Cookies from "universal-cookie";
-import  axios  from "axios";
 import { VscSignIn } from "react-icons/vsc";
 import { SiGnuprivacyguard } from "react-icons/si";
 import { Button, Label, TextInput } from "flowbite-react";
@@ -16,7 +15,7 @@ const initialState = {
 export default function Autho() {
     const [  isSignup , setIsSignup ] = useState(true);
     const [ formData , setFormData ] = useState(initialState);
-
+    const cookie = new Cookies();
     //handle form input data
     const handleChange = (e)=> {
         setFormData({
@@ -35,7 +34,33 @@ export default function Autho() {
     const handleSubmit = async(e)=> {
         e.preventDefault();
         try {
-            console.log(formData);
+            const response = await fetch(
+                `/api/user/${isSignup ? 'signup': 'login'}`,
+                {
+                    method : "POST",
+                    headers : { "Content-Type" : "application/json" },
+                    body : JSON.stringify({user : formData})
+                }
+            );
+            const data = await response.json();
+            console.log(data);
+            if(response.ok) {
+                cookie.set("token", data.token);
+                cookie.set('username', data.user.username);
+                cookie.set("fullName", data.user.fullName);
+                cookie.set("userId", data.user._id);
+                cookie.set("avatar" , data.user.avatar);
+
+                if(isSignup) {
+                    cookie.set("token", data.token);
+                    cookie.set("username", data.user.username);
+                    cookie.set("fullName", data.user.fullName);
+                    cookie.set("userId", data.user._id);
+                    cookie.set("mobileNumber" , data.user.mobileNumber);
+                    cookie.set("avatar" , data.user.avatar);
+                }
+                window.location.reload();
+            }
         }catch(err) {console.log(err.message);}
     }
     return (
@@ -44,7 +69,7 @@ export default function Autho() {
                 <p className="text-2xl font-mono font-bold leading-8 text-center py-8" >{ isSignup ? 'Sign up'  : 'Sign in' }</p>
                 <span className="inline-block absolute top-3 right-3 border border-black rounded-full p-2" >{ isSignup ? <SiGnuprivacyguard size={26} /> : <VscSignIn size={26} /> }</span>
                 <div className="p-6" >
-                    <form onSubmit={handleChange}>
+                    <form onSubmit={handleSubmit}>
                         { isSignup &&  (
                             <div>
                                 <Label htmlFor="fullName">Full Name</Label>
@@ -76,7 +101,6 @@ export default function Autho() {
                             outline 
                             type="submit"
                             className="my-4 w-full"
-                            onClick={handleSubmit}
 
                         >{isSignup ? 'Ragister' : 'Log In'}</Button>
                     </form>
