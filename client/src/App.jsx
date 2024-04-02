@@ -1,41 +1,52 @@
 import { StreamChat } from "stream-chat";
-import { Chat } from "stream-chat-react";
+import { Chat, Channel, ChannelList, ChannelHeader, MessageList, MessageInput, Thread, ChannelSearch } from "stream-chat-react";
 import Cookies from "universal-cookie";
-import ChannelListContainer from "./components/ChannelListContainer";
-import ChannelContainer from "./components/ChannelContainer";
 import Auth from "./components/Auth";
+import { useEffect } from "react";
 
-const cookies  = new Cookies();
+import 'stream-chat-react/dist/css/v2/index.css';
+
+const cookies = new Cookies();
 
 const apiKey = 'sh4p4y7zy97n';
-const authToken = cookies.get('token'); 
+const authToken = cookies.get('token');
 const client = StreamChat.getInstance(apiKey);
 
-if(authToken) {
-  client.connectUser({
-    id : cookies.get("userId"),
-    name : cookies.get("username"),
-    fullName : cookies.get("fullName"),
-    image : cookies.get("avatar"),
-    mobileNumber : cookies.get("mobileNumber"),
-  }, authToken);
-}
 
 
 export default function App() {
-  if(!authToken) {
+
+  useEffect(() => {
+    if (authToken) {
+      client.connectUser({
+        id: cookies.get("userId"),
+        name: cookies.get("username"),
+        fullName: cookies.get("fullName"),
+        image: cookies.get("avatar"),
+        mobileNumber: cookies.get("mobileNumber"),
+      }, authToken);
+    }
+  }, [authToken, client, cookies]);
+
+  if (!authToken) {
     return (
-      <Auth  />
+      <Auth />
     );
   }
+
   return (
-   <>
-   <div className="flex" >
-    <Chat client={client} theme="team light" >
-      <ChannelListContainer />
-      <ChannelContainer  />
+    <>
+    <Chat client={client}>
+      <ChannelList />
+      <Channel>
+        <div className="flex flex-col gap-4 w-full relative" >
+          <MessageList />
+          <MessageInput />
+        </div>
+        <Thread />
+      </Channel>
     </Chat>
-   </div>
-   </>
+    </>
   );
 }
+

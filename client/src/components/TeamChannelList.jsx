@@ -30,5 +30,5 @@ export default function TeamChannelList({ children, error = false , loading , ty
             </div>
             { children }
         </div>
-    )
+    );
 }
